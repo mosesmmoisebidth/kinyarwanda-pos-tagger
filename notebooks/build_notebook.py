@@ -7,39 +7,20 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = "mosesmmoisebidth/kinyarwanda-pos-tagger"
-man = json.load(open(os.path.join(ROOT, "models.json"), encoding="utf-8"))
-models = man["models"]
-by_key = {(m["recipe"], m["model"]): m for m in models}
-best = man["best"]
-RECIPE_TXT = {"full": "full recipe", "plain": "plain fine-tune"}
+import sys
+sys.path.insert(0, os.path.join(ROOT, "src"))
+from compare_pairs import MODELS, PAIRS  # noqa: E402
 
+RECIPE_TXT = {"full": "full recipe", "plain": "plain fine-tune"}
 SAMPLE = ("Mu barwayi bashya abenshi babonetse mu mujyi wa Kigali 59 naho 14 babonetse muri Rubavu. "
           "Abakirwaye bose ni 953 barimo icyenda barembye.")
 SAMPLE2 = ("Rugwizangoga yavuze ko Ubald kuva icyo gihe ariwe wahindutse nk'umugabo mu rugo, akaba umujyanama "
            "wa nyina ndetse uko yakuraga akagenda arushaho kubyitwaramo neza.")
-
-
-def option(m):
-    s = f"{m['id']} | {m['label']}, {m['family']}, {RECIPE_TXT[m['recipe']]}, {m['mean_test']:.2f}% test"
-    return s + " (best)" if m["id"] == best else s
-
-
-options = [option(m) for m in sorted(models, key=lambda m: (m["recipe"] != "full", -m["mean_test"]))]
-pairs = []
-for g, a, title in man["pairs"]:
-    if any(m["model"] == g for m in models) and any(m["model"] == a for m in models):
-        pairs.append((f"{title.split(' (')[0]}: {by_key.get(('full', g), by_key.get(('plain', g)))['label']} vs "
-                      f"{by_key.get(('full', a), by_key.get(('plain', a)))['label']}", g, a))
-recipes = [r for r in ("full", "plain") if any(m["recipe"] == r for m in models)]
-
-
-def table():
-    rows = ["| Model | Type | Size | Recipe | Test accuracy (mean of 5 seeds) | Unseen words |", "|---|---|---|---|---|---|"]
-    for m in sorted(models, key=lambda m: (m["recipe"] != "full", -m["mean_test"])):
-        name = f"**{m['label']}**" if m["id"] == best else m["label"]
-        rows.append(f"| {name} | {m['family']} | {m['params']} | {RECIPE_TXT[m['recipe']]} | "
-                    f"{m['mean_test']:.2f} ± {m['std_test']:.2f} | {m['mean_oov']:.2f} |")
-    return "\n".join(rows)
+# Fixed option lists (accuracy is read from models.json at run time, so the notebook never needs rebuilding)
+options = [f"{r}_{k} | {MODELS[k]['label']} ({MODELS[k]['family']}, {MODELS[k]['params']}), {RECIPE_TXT[r]}"
+           for r in ("full", "plain") for g, a, _ in PAIRS for k in (a, g)]
+pairs = [(f"{t.split(' (')[0]}: {MODELS[g]['label']} vs {MODELS[a]['label']}", g, a) for g, a, t in PAIRS]
+recipes = ["full", "plain"]
 
 
 def md(text):
@@ -67,8 +48,7 @@ multilingual model with an **Afro-centric** one, so you can see which is more ac
 
 Code, results and details: [github.com/{REPO}](https://github.com/{REPO})
 
-### Models (test set: 604 sentences, about 17k words)
-{table()}
+The setup cell below prints every model with its test accuracy (604 test sentences, about 17k words).
 """),
     code(f"""
 #@title 1. Setup (gets the code, about 30 seconds)
@@ -85,6 +65,7 @@ sys.path.insert(0, os.path.join(REPO, "src"))
 import kinpos_infer as K
 importlib.reload(K)
 print("Ready. Running on", "GPU" if K.DEVICE.type == "cuda" else "CPU", "|", len(K.MANIFEST["models"]), "trained models available")
+K.show_models()
 """),
     code(f"""
 #@title 2. Choose a model (downloads it the first time, 0.3 to 1.1 GB)
@@ -94,6 +75,8 @@ m = K.BY_ID[MODEL_ID]
 K.get(MODEL_ID)
 print(f"Loaded {{m['label']}} ({{m['family']}}, {{m['params']}} parameters, {{m['recipe']}} recipe).")
 print(f"Test accuracy: {{m['mean_test']:.2f}}% on average over 5 training runs; this checkpoint {{m['test']:.2f}}%.")
+if MODEL_ID == K.MANIFEST["best"]:
+    print("This is the most accurate model.")
 """),
     code(f"""
 #@title 3. Tag Kinyarwanda text

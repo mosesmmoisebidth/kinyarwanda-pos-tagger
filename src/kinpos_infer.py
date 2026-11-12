@@ -140,6 +140,24 @@ def show_compare(mid_a, mid_b, text):
     return a, b
 
 
+def show_models():
+    """Table of every trained model with its accuracy (best first within each recipe)."""
+    from IPython.display import HTML, display
+    td = "<td style='padding:4px 10px'>"
+    rows = []
+    for m in sorted(MANIFEST["models"], key=lambda m: (m["recipe"] != "full", -m["mean_test"])):
+        best = m["id"] == MANIFEST["best"]
+        fg, bg = ("#b45309", "#fff3e0") if m["family"] == "Afro-centric" else ("#1d4ed8", "#e8efff")
+        rows.append(
+            f"<tr style='{'font-weight:700' if best else ''}'>{td}{html.escape(m['label'])}{' (best)' if best else ''}</td>"
+            f"{td}<span style='color:{fg};background:{bg};border-radius:99px;padding:1px 8px'>{m['family']}</span></td>"
+            f"{td}{m['params']}</td>{td}{'full recipe' if m['recipe'] == 'full' else 'plain fine-tune'}</td>"
+            f"{td}{m['mean_test']:.2f} ± {m['std_test']:.2f}</td>{td}{m['mean_oov']:.2f}</td>{td}{m['size_mb']} MB</td></tr>")
+    head = "".join(f"<th style='text-align:left;padding:4px 10px'>{h}</th>" for h in
+                   ["Model", "Type", "Size", "Recipe", "Test accuracy % (5 seeds)", "Unseen words %", "Download"])
+    display(HTML(f"<table style='border-collapse:collapse;font:14px system-ui'><tr>{head}</tr>{''.join(rows)}</table>"))
+
+
 def masakhane_data(dest="/content/masakhane-pos"):
     if not os.path.isdir(os.path.join(dest, "data", "kin")):
         subprocess.run(["git", "clone", "-q", "--depth", "1", "https://github.com/masakhane-io/masakhane-pos", dest],

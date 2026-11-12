@@ -1,5 +1,7 @@
 # Kinyarwanda POS Tagging: General vs Afro-centric Models
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mosesmmoisebidth/kinyarwanda-pos-tagger/blob/main/notebooks/Kinyarwanda_POS_Tagger.ipynb)
+
 Part-of-speech tagger for Kinyarwanda trained on [MasakhaPOS](https://github.com/masakhane-io/masakhane-pos)
 (Universal Dependencies, 17 tags), comparing **general multilingual** pretrained models with
 **Afro-centric** ones, plus a local web UI to switch between the trained models.
