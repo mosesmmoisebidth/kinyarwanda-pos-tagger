@@ -1,0 +1,11 @@
+# Model pairs, recipe "plain": fine-tune on Kinyarwanda only (MasakhaPOS paper protocol: 20 epochs,
+# batch 32, keep the best dev epoch). 5 seeds per line; the learning rate is picked per model on dev.
+# Main pair (same XLM-R large architecture): general XLM-RoBERTa-large vs Afro-centric AfroXLMR-large-76L.
+# Reference pair (base size): mBERT vs AfriBERTa-large.
+# Submit: sbatch --array=0-29 --export=ALL,CFG=slurm/cfg_pairs.txt,PHASE=pairs slurm/ablate.slurm
+xlmr-large_lr5e5|FacebookAI/xlm-roberta-large|--train_langs kin --eval_test --lr 5e-5
+xlmr-large_lr2e5|FacebookAI/xlm-roberta-large|--train_langs kin --eval_test --lr 2e-5
+afroxlmr-76L_lr5e5|Davlan/afro-xlmr-large-76L|--train_langs kin --eval_test --lr 5e-5
+afroxlmr-76L_lr2e5|Davlan/afro-xlmr-large-76L|--train_langs kin --eval_test --lr 2e-5
+mbert_lr5e5|google-bert/bert-base-multilingual-cased|--train_langs kin --eval_test --lr 5e-5
+afriberta-large_lr5e5|castorini/afriberta_large|--train_langs kin --eval_test --lr 5e-5

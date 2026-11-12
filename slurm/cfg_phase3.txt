@@ -1,0 +1,5 @@
+# name|model|extra args   (5 seeds each, dev only; compare to phase0 afroxlmr-large-76L dev 97.80)
+crf|Davlan/afro-xlmr-large-76L|--train_langs kin --use_crf
+charaffix|Davlan/afro-xlmr-large-76L|--train_langs kin --use_char --use_affix --head_hidden 512
+full|Davlan/afro-xlmr-large-76L|--train_langs kin --use_char --use_affix --use_crf --head_hidden 512
+full_mix|Davlan/afro-xlmr-large-76L|--train_langs kin --use_char --use_affix --use_crf --head_hidden 512 --pool mean --mix_layers 4

@@ -1,0 +1,14 @@
+# local environments, data, checkpoints, scratch
+.venv*/
+data_raw/
+models/
+runs/
+logs/
+code_upload/
+dist/
+.playwright-mcp/
+__pycache__/
+*.pt
+*.zip
+*.tar.gz
+Annotation Guidelines for POS.pdf

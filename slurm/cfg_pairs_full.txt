@@ -1,0 +1,11 @@
+# Model pairs, recipe "full": Stage 1 multilingual MasakhaPOS model (stage1.slurm, one per backbone),
+# then Kinyarwanda fine-tuning with char CNN + affix features + CRF. 5 seeds per line, lr picked on dev.
+# Submit: sbatch --array=0-39 --export=ALL,CFG=slurm/cfg_pairs_full.txt,PHASE=pairs_full slurm/ablate.slurm
+xlmr-large_lr2e5|FacebookAI/xlm-roberta-large|--train_langs kin --init_from $BASE/runs/stage1_xlmr-large/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 2e-5 --epochs 10
+xlmr-large_lr5e5|FacebookAI/xlm-roberta-large|--train_langs kin --init_from $BASE/runs/stage1_xlmr-large/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 5e-5 --epochs 20
+afroxlmr-76L_lr2e5|Davlan/afro-xlmr-large-76L|--train_langs kin --init_from $BASE/runs/stage1_base/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 2e-5 --epochs 10
+afroxlmr-76L_lr5e5|Davlan/afro-xlmr-large-76L|--train_langs kin --init_from $BASE/runs/stage1_base/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 5e-5 --epochs 20
+mbert_lr2e5|google-bert/bert-base-multilingual-cased|--train_langs kin --init_from $BASE/runs/stage1_mbert/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 2e-5 --epochs 10
+mbert_lr5e5|google-bert/bert-base-multilingual-cased|--train_langs kin --init_from $BASE/runs/stage1_mbert/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 5e-5 --epochs 20
+afriberta-large_lr2e5|castorini/afriberta_large|--train_langs kin --init_from $BASE/runs/stage1_afriberta-large/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 2e-5 --epochs 10
+afriberta-large_lr5e5|castorini/afriberta_large|--train_langs kin --init_from $BASE/runs/stage1_afriberta-large/model.pt --use_char --use_affix --use_crf --head_hidden 512 --eval_test --lr 5e-5 --epochs 20

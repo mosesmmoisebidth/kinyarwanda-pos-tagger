@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinyarwanda POS Tagger</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Kinyarwanda POS Tagger</h1>
+      <p class="sub">General multilingual models vs Afro-centric models, trained on MasakhaPOS (Universal Dependencies tags).</p>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="tag" aria-selected="true">Tag text</button>
+      <button role="tab" data-tab="results" aria-selected="false">Results</button>
+      <button role="tab" data-tab="browse" aria-selected="false">Test set</button>
+    </nav>
+  </header>
+
+  <!-- ============ TAG ============ -->
+  <section id="tab-tag" class="tab">
+    <div class="card">
+      <div class="row between">
+        <h2>Choose a model</h2>
+        <div class="seg" id="recipeSeg" aria-label="Training recipe"></div>
+      </div>
+      <div class="models" id="models"></div>
+      <label class="check"><input type="checkbox" id="compare"> Compare with its pair partner (shows where the two models disagree)</label>
+    </div>
+
+    <div class="card">
+      <textarea id="txt" spellcheck="false" placeholder="Andika cyangwa ushyiremo inyandiko y'Ikinyarwanda..."></textarea>
+      <div class="samples" id="samples"></div>
+      <div class="row">
+        <button class="primary" id="go">Tag text</button>
+        <button id="clear">Clear</button>
+        <span class="hint">Ctrl + Enter also works</span>
+      </div>
+    </div>
+    <div id="status" class="status" aria-live="polite"></div>
+    <div class="card" id="out" hidden>
+      <div id="outHead" class="out-head"></div>
+      <div id="sents"></div>
+      <div class="counts" id="counts"></div>
+      <details class="plain"><summary>Plain output</summary><pre id="plain"></pre><button id="copy">Copy</button></details>
+    </div>
+    <details class="legend-box"><summary>What the tags mean</summary><div class="legend" id="legend"></div></details>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="tab-results" class="tab" hidden>
+    <div id="verdicts"></div>
+    <div class="card">
+      <h2>Leaderboard</h2>
+      <p class="hint">Test accuracy on 604 Kinyarwanda sentences (mean and spread over seeds). OOV = words never seen in training.</p>
+      <div class="table-wrap"><table id="board"></table></div>
+    </div>
+    <div class="card">
+      <h2>Where the Afro-centric model wins or loses, by tag</h2>
+      <p class="hint">F1 difference per tag (Afro-centric minus general), tags with at least 20 test tokens.</p>
+      <div class="row"><select id="tagPair"></select></div>
+      <div id="tagBars" class="bars"></div>
+    </div>
+  </section>
+
+  <!-- ============ BROWSE ============ -->
+  <section id="tab-browse" class="tab" hidden>
+    <div class="card">
+      <h2>Test sentences where the two models disagree</h2>
+      <p class="hint">Gold tags from the annotators, then each model. Red tags are wrong.</p>
+      <div class="row wrap-row">
+        <select id="bPair" aria-label="Pair"></select>
+        <select id="bFilter" aria-label="Filter">
+          <option value="all">All disagreements</option>
+          <option value="afro">Afro-centric model makes fewer errors</option>
+          <option value="general">General model makes fewer errors</option>
+          <option value="tie">Same number of errors</option>
+        </select>
+        <span class="hint" id="bCount"></span>
+      </div>
+    </div>
+    <div id="bList"></div>
+    <div class="row center"><button id="bMore" hidden>Show more</button></div>
+  </section>
+
+  <footer class="foot">Data: MasakhaPOS (CC BY-NC 4.0). Models run locally on your computer.</footer>
+</div>
+<div id="toast" class="toast" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
