@@ -47,8 +47,11 @@ def job_list(out):
     plain = lambda seeds: [("plain", m, s) for s in seeds for m in ORDER]
     full = lambda seeds: [("full", m, s) for s in seeds for m in ORDER]
     jobs += plain([1, 2, 3])
-    jobs += [("stage1", m, 1) for m in ORDER]
-    jobs += full([1, 2, 3])
+    # main pair (XLM-R large vs AfroXLMR) first: its Stage 1 + full-recipe seeds, then the base pair
+    jobs += [("stage1", m, 1) for m in ORDER[:2]]
+    jobs += [("full", m, s) for s in (1, 2, 3) for m in ORDER[:2]]
+    jobs += [("stage1", m, 1) for m in ORDER[2:]]
+    jobs += [("full", m, s) for s in (1, 2, 3) for m in ORDER[2:]]
     jobs += plain([4, 5])
     jobs += full([4, 5])
     return jobs
