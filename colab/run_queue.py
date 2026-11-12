@@ -34,9 +34,11 @@ LANGS = "kin:3,sna:2,lug:2,nya:2,swa:2,xho:2,zul:2,tsn:2,bam:1,bbj:1,ewe:1,fon:1
 
 PLAIN = "--train_langs kin --eval_test --epochs 20 --batch_size 32 --lr 5e-5"
 STAGE1 = (f"--train_langs {LANGS} --aux_splits train,dev,test --use_char --use_affix --use_crf --head_hidden 512 "
-          "--epochs 6 --steps_per_epoch 400 --batch_size 32 --lr 5e-5 --patience 2 --seed 1")
+          "--epochs 6 --steps_per_epoch 800 --batch_size 16 --max_len 256 --lr 5e-5 --patience 2 --seed 1")
+# T4 (15 GB): multilingual batches hold long sentences, so Stage 1 uses batch 16 x 800 steps (same sentences per
+# epoch as 32 x 400) and 256-subword chunks; Stage 2 also uses 256-subword chunks.
 FULL = ("--train_langs kin --init_from {init} --use_char --use_affix --use_crf --head_hidden 512 "
-        "--eval_test --epochs 10 --batch_size 32 --lr 2e-5")
+        "--eval_test --epochs 10 --batch_size 32 --max_len 256 --lr 2e-5")
 
 
 def job_list(out):
@@ -121,7 +123,8 @@ def main():
         t0 = time.time()
         log_path = os.path.join(args.out, "logs", name.replace("/", "_") + ".log")
         with open(log_path, "w", encoding="utf-8") as log:
-            rc = subprocess.call(cmd, stdout=log, stderr=subprocess.STDOUT)
+            env = dict(os.environ, PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True")
+            rc = subprocess.call(cmd, stdout=log, stderr=subprocess.STDOUT, env=env)
         minutes = round((time.time() - t0) / 60, 1)
         mfile = os.path.join(work, "metrics.json")
         if rc != 0 or not os.path.isfile(mfile):
